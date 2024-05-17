@@ -13,15 +13,22 @@ class CotizacionController extends Controller
         try {
             $clientName = $request['nombres'];
             $clientBusiness = $request['empresa'];
+            $currentDate = Carbon::now();
+            $codeNull= null;
+            //code is yy+4digitos, yy is the last 2 digits of the year and 4 digitos is a number of  row in the table in the year
+            $year = Carbon::now()->format('y');
+            $count = DB::table('carga_consolidada_cotizaciones_cabecera')->whereYear('Fe_Creacion', $currentDate->year)->count()+1;
+            $code = $year . str_pad($count, 4, '0', STR_PAD_LEFT);
             $tipoCliente = 1;
             $cotizationStatus = "Pendiente";
-            $currentDate = Carbon::now();
+            
             $cotizationID = DB::table('carga_consolidada_cotizaciones_cabecera')->insertGetId([
                 'N_Cliente' => $clientName,
                 'Empresa' => $clientBusiness,
                 'Fe_Creacion' => $currentDate,
                 'ID_Tipo_Cliente' => $tipoCliente,
                 "Cotizacion_Status" => $cotizationStatus,
+                "CotizacionCode"=>$code
             ]);
         
             $productos = [];
