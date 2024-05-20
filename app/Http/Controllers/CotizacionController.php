@@ -34,7 +34,7 @@ class CotizacionController extends Controller
                 "CotizacionCode"=>$code
             ]);
           
-
+            
             $productos = [];
             $CBMTotal = 0;
             $pesoTotal = 0;
