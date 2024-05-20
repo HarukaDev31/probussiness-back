@@ -12,7 +12,10 @@ class CotizacionController extends Controller
         DB::beginTransaction();
         try {
             $clientName = $request['nombres'];
+            $clientLastName = $request['apellidos'];
             $clientBusiness = $request['empresa'];
+            $clientTelephone = $request['whatsapp'];
+            $clientDNI = $request['dni'];
             $currentDate = Carbon::now();
             $codeNull= null;
             //code is yy+4digitos, yy is the last 2 digits of the year and 4 digitos is a number of  row in the table in the year
@@ -23,16 +26,18 @@ class CotizacionController extends Controller
             $cotizationStatus = "Pendiente";
             
             $cotizationID = DB::table('carga_consolidada_cotizaciones_cabecera')->insertGetId([
-                'N_Cliente' => $clientName,
+                'N_Cliente' => $clientName." ".$clientLastName,
                 'Empresa' => $clientBusiness,
                 'Fe_Creacion' => $currentDate,
                 'ID_Tipo_Cliente' => $tipoCliente,
                 "Cotizacion_Status" => $cotizationStatus,
                 "CotizacionCode"=>$code
             ]);
-        
+          
+
             $productos = [];
-        
+            $CBMTotal = 0;
+            $pesoTotal = 0;
             foreach ($request->all() as $key => $value) {
                 // Verificar si la clave comienza con 'proveedor-'
                 if (strpos($key, 'proveedor-') === 0) {
@@ -56,7 +61,10 @@ class CotizacionController extends Controller
             foreach ($productos as $proveedorIndex => $productosProveedor) {
                 // Inserta los datos del proveedor en la tabla correspondiente
                 $CBM = $request->input("proveedor-{$proveedorIndex}-cbm");
+
+                $CBMTotal += $CBM;
                 $peso = $request->input("proveedor-{$proveedorIndex}-peso");
+                $pesoTotal += $peso;
                 $proformas= $request->file("proveedor-{$proveedorIndex}-proforma[]");
                 //foreahc file in proformas
                 $urlProforma=null;
@@ -116,10 +124,19 @@ class CotizacionController extends Controller
                     }
                 }
             }
-        
+            DB::table('carga_consolidada_cotizaciones_detalle')->insert([
+                'ID_Cotizacion' => $cotizationID,
+                'CBM_Total' => $CBMTotal,
+                'Peso_Total' => $pesoTotal,
+                "DNI" => $clientDNI,
+                "Nombres" => $clientName,
+                "Apellidos" => $clientLastName,
+                "Telefono" => $clientTelephone,
+            ]);
             DB::commit();
             return response()->json([
                 'message' => 'Cotización creada correctamente',
+                "status" => 201
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
