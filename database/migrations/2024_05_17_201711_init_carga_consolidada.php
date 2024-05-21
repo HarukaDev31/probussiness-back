@@ -308,7 +308,7 @@ class InitCargaConsolidada extends Migration
           `Cotizacion` decimal(10,2) DEFAULT NULL,
           `ID_Tipo_Cliente` int(11) NOT NULL,
           `Cotizacion_Status` enum('Pendiente','Cotizado') DEFAULT 'Pendiente',
-          `CotizacionCode` char(6) NOT NULL DEFAULT concat(month(current_timestamp()),1),
+          `CotizacionCode` char(6) NOT NULL DEFAULT '',
           `created_at` date DEFAULT NULL,
           `Cotizacion_Status_ID` int(11) DEFAULT 1,
           PRIMARY KEY (`ID_Cotizacion`),

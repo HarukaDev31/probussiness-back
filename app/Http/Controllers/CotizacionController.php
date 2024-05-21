@@ -31,7 +31,8 @@ class CotizacionController extends Controller
                 'Fe_Creacion' => $currentDate,
                 'ID_Tipo_Cliente' => $tipoCliente,
                 "Cotizacion_Status" => $cotizationStatus,
-                "CotizacionCode"=>$code
+                "CotizacionCode"=>$code,
+                'created_at' => $currentDate,
             ]);
             $productos = [];
             $CBMTotal = 0;

@@ -17,10 +17,13 @@ class InitProcedures extends Migration
         begin
             declare precio decimal(10,2)  default 0;
             declare v_tarifa decimal(10,2) default 0;
+           	declare v_cotizacion_created_at timestamp default now();
+           	select created_at into v_cotizacion_created_at from carga_consolidada_cotizaciones_cabecera where ID_Cotizacion=id_cotizacion limit 1 ;
             select if(id_tipo_tarifa=1,tarifa,tarifa*cbm)  into v_tarifa from carga_consolidada_cbm_tarifas  ccbt
             where (cbm >= ccbt.limite_inf and cbm<=ccbt.limite_sup
-            and ccbt.id_tipo_cliente=tipo_cliente) limit 1;
-            
+            and ccbt.id_tipo_cliente=tipo_cliente and
+           	date(ccbt.created_at)>=ifnull(v_cotizacion_created_at,'1999-01-01')
+            ) limit 1;
             return v_tarifa;
         END";
         $getCotizationTributos="CREATE PROCEDURE `get_cotization_tributos_v2`( IN p_id_cotizacion int )
