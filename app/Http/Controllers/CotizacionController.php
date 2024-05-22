@@ -74,11 +74,13 @@ class CotizacionController extends Controller
                 if($proforma){
                     $nombreArchivo = uniqid('proforma_');
                     $urlProforma = Storage::put('public/proformas/' . $nombreArchivo, $proforma);
+                    $urlProforma = config('app.url') . Storage::url($urlProforma);
                 }
                 $packing = $request->file("proveedor-{$proveedorIndex}-proforma-1");
                 if($packing){
                     $nombreArchivo = uniqid('packing_');
                     $urlPacking = Storage::put('public/packings/' . $nombreArchivo, $packing);
+                    $urlPacking = config('app.url') . Storage::url($urlPacking);
                 }
                 $proveedorID = DB::table('carga_consolidada_cotizaciones_detalles_proovedor')->insertGetId([
                     'ID_Cotizacion' => $cotizationID,
