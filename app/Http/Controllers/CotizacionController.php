@@ -99,7 +99,7 @@ class CotizacionController extends Controller
                     $archivo = $request->file("proveedor-{$proveedorIndex}-producto-{$productoIndex}-foto");
                     $nombreArchivo = uniqid('imagen_') . '.png';
                     $urlImagen = Storage::put('public/imagenes/' . $nombreArchivo, $archivo);
-        
+                    $urlAbsoluta = config('app.url') . Storage::url($urlImagen);
                     // Inserta los datos del producto en la tabla correspondiente
                     $productoID = DB::table('carga_consolidada_cotizaciones_detalles_producto')->insertGetId([
                         'ID_Proveedor' => $proveedorID,
@@ -108,7 +108,7 @@ class CotizacionController extends Controller
                         'Uso' => $uso,
                         'Cantidad' => $cantidad,
                         'URL_Link' => $link,
-                        'URL_Image' =>"storage/app/". $urlImagen,
+                        'URL_Image' =>$urlAbsoluta,
                     ]);
         
                     // Inserta los tipos de tributo para el producto
