@@ -72,12 +72,12 @@ class CotizacionController extends Controller
                 //proveedor-0-proforma-1 is urlPacking
                 $proforma = $request->file("proveedor-{$proveedorIndex}-proforma-0");
                 if($proforma){
-                    $nombreArchivo = uniqid('proforma_') . '.pdf';
+                    $nombreArchivo = uniqid('proforma_');
                     $urlProforma = Storage::put('public/proformas/' . $nombreArchivo, $proforma);
                 }
                 $packing = $request->file("proveedor-{$proveedorIndex}-proforma-1");
                 if($packing){
-                    $nombreArchivo = uniqid('packing_') . '.pdf';
+                    $nombreArchivo = uniqid('packing_');
                     $urlPacking = Storage::put('public/packings/' . $nombreArchivo, $packing);
                 }
                 $proveedorID = DB::table('carga_consolidada_cotizaciones_detalles_proovedor')->insertGetId([
@@ -97,7 +97,7 @@ class CotizacionController extends Controller
         
                     // Maneja el archivo de imagen
                     $archivo = $request->file("proveedor-{$proveedorIndex}-producto-{$productoIndex}-foto");
-                    $nombreArchivo = uniqid('imagen_') . '.png';
+                    $nombreArchivo = uniqid('image_');
                     $urlImagen = Storage::put('public/imagenes/' . $nombreArchivo, $archivo);
                     $urlAbsoluta = config('app.url') . Storage::url($urlImagen);
                     // Inserta los datos del producto en la tabla correspondiente
