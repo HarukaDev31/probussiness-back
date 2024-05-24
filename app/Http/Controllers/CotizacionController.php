@@ -96,7 +96,6 @@ class CotizacionController extends Controller
                     $uso = $request->input("proveedor-{$proveedorIndex}-producto-{$productoIndex}-uso");
                     $cantidad = $request->input("proveedor-{$proveedorIndex}-producto-{$productoIndex}-cantidad");
                     $link = $request->input("proveedor-{$proveedorIndex}-producto-{$productoIndex}-link");
-                    $
                     // Maneja el archivo de imagen
                     $archivo = $request->file("proveedor-{$proveedorIndex}-producto-{$productoIndex}-foto");
                     $nombreArchivo = uniqid('image_');
@@ -139,7 +138,7 @@ class CotizacionController extends Controller
                             "ID_Cotizacion" => $cotizationID,
                             'ID_Tipo_Tributo' => $tribute,
                             "ID_Producto" => $productoID,
-                            "value" => $defaultValue,
+                            "value"=>$defaultValue
                         ]);
                     }
                 }
