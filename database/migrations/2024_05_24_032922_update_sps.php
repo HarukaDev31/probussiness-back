@@ -18,46 +18,52 @@ class UpdateSps extends Migration
         $sp="CREATE PROCEDURE `get_cotization_tributos_v2`(IN p_id_cotizacion int)
         begin
             
-            -- valor flete y valor destino
-            set @flete=0.6;
-            set @destino=0.4;
-            -- Obtener la suma de FOB y FOB valorado
-            SELECT
-                SUM(Cantidad * Valor_unitario) AS sum_fob,
-                SUM(Cantidad * (SELECT get_tribute_value(ID_Producto, 5))) AS sum_fob_valorado
-            INTO
-                @sum_fob,
-                @sum_fob_valorado
-            FROM
-                carga_consolidada_cotizaciones_detalles_producto
-            WHERE
-                ID_Cotizacion = p_id_cotizacion;
+               declare v_t_cliente int default 1;
         
-            -- Obtener la suma de CBM total y Peso total
-            SELECT
-                SUM(CBM_Total) AS cbm_total,
-                SUM(Peso_Total) AS peso_total
-            INTO
-                @cbm_total,
-                @peso_total
-            FROM
-                carga_consolidada_cotizaciones_detalles_proovedor
-            WHERE
-                ID_Cotizacion = p_id_cotizacion;
-        
-            -- Calcular el seguro total
-            SET @seguro_total = CASE
-            WHEN (IF(@sum_fob_valorado = 0, @sum_fob, @sum_fob_valorado) + (SELECT get_cbm_total(@cbm_total, 1) * @flete)) > 5000 THEN 100
-            ELSE 50
+        -- valor flete y valor destino
+        set @flete=0.6;
+        set @destino=0.4;
+        select ID_Tipo_Cliente into v_t_cliente from carga_consolidada_cotizaciones_cabecera cccc where cccc.ID_Cotizacion=p_id_cotizacion;
+        -- Obtener la suma de FOB y FOB valorado
+        SELECT
+            SUM(Cantidad * Valor_unitario) AS sum_fob,
+            SUM(Cantidad * (SELECT get_tribute_value(ID_Producto, 5))) AS sum_fob_valorado,
+            SUM(Cantidad) as total_cantidad
+        INTO
+            @sum_fob,
+            @sum_fob_valorado,
+            @total_cantidad
+        FROM
+            carga_consolidada_cotizaciones_detalles_producto
+        WHERE
+            ID_Cotizacion = p_id_cotizacion;
+    
+        -- Obtener la suma de CBM total y Peso total
+        SELECT
+            SUM(CBM_Total) AS cbm_total,
+            SUM(Peso_Total) AS peso_total
+        INTO
+            @cbm_total,
+            @peso_total
+        FROM
+            carga_consolidada_cotizaciones_detalles_proovedor
+        WHERE
+            ID_Cotizacion = p_id_cotizacion;
+    
+        -- Calcular el seguro total
+        SET @seguro_total = CASE
+        WHEN (IF(@sum_fob_valorado = 0, @sum_fob, @sum_fob_valorado) + (SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente) * @flete)) > 5000 THEN 100
+        ELSE 50
+    END;
+        -- Calcular el CIF total
+        SET @cif_total = @seguro_total + @sum_fob + (SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente) * @flete);
+    
+        -- Calcular el CIF valorado total
+        SET @cif_valorado_total = CASE
+            WHEN @sum_fob_valorado = 0 THEN 0
+            ELSE @seguro_total + @sum_fob_valorado + (SELECT get_cbm_total(p_id_cotizacion,@cbm_total,v_t_cliente) * @flete)
         END;
-            -- Calcular el CIF total
-            SET @cif_total = @seguro_total + @sum_fob + (SELECT get_cbm_total(@cbm_total, 1) * @flete);
-        
-            -- Calcular el CIF valorado total
-            SET @cif_valorado_total = CASE
-                WHEN @sum_fob_valorado = 0 THEN 0
-                ELSE @seguro_total + @sum_fob_valorado + (SELECT get_cbm_total(@cbm_total, 1) * @flete)
-            END;
+
         
             select
                                     cccdp.Nombre_Comercial,
