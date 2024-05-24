@@ -2,13 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+
 class CotizacionController extends Controller
 {
-    public function createCotization(Request $request){
+    public function generateUniqueCode($year)
+    {
+        $count = DB::table('carga_consolidada_cotizaciones_cabecera')
+            ->whereYear('Fe_Creacion', $year)
+            ->count() + 1;
+        $yearLastTwoDigits = substr($year, 2);   
+        return $yearLastTwoDigits . str_pad($count, 4, '0', STR_PAD_LEFT);
+    }
+    public function createCotization(Request $request)
+    {
         DB::beginTransaction();
         try {
             $clientName = $request['nombres'];
@@ -17,21 +27,25 @@ class CotizacionController extends Controller
             $clientTelephone = $request['whatsapp'];
             $clientDNI = $request['dni'];
             $currentDate = Carbon::now();
-            $codeNull= null;
+            $codeNull = null;
             //code is yy+4digitos, yy is the last 2 digits of the year and 4 digitos is a number of  row in the table in the year
             $year = Carbon::now()->format('y');
-            $count = DB::table('carga_consolidada_cotizaciones_cabecera')->whereYear('Fe_Creacion', $currentDate->year)->count()+1;
+            $count = DB::table('carga_consolidada_cotizaciones_cabecera')->whereYear('Fe_Creacion', $currentDate->year)->count() + 1;
             $code = $year . str_pad($count, 4, '0', STR_PAD_LEFT);
             $tipoCliente = 1;
             $cotizationStatus = "Pendiente";
-            
-            $cotizationID = DB::table('carga_consolidada_cotizaciones_cabecera')->insertGetId([
-                'N_Cliente' => $clientName." ".$clientLastName,
+            $code = $this->generateUniqueCode($currentDate->year);
+
+            // Verificar unicidad del código
+            while (DB::table('carga_consolidada_cotizaciones_cabecera')->where('CotizacionCode', $code)->exists()) {
+                $code = $this->generateUniqueCode($currentDate->year);
+            }$cotizationID = DB::table('carga_consolidada_cotizaciones_cabecera')->insertGetId([
+                'N_Cliente' => $clientName . " " . $clientLastName,
                 'Empresa' => $clientBusiness,
                 'Fe_Creacion' => $currentDate,
                 'ID_Tipo_Cliente' => $tipoCliente,
                 "Cotizacion_Status" => $cotizationStatus,
-                "CotizacionCode"=>$code,
+                "CotizacionCode" => $code,
                 'created_at' => $currentDate,
             ]);
             $productos = [];
@@ -44,19 +58,19 @@ class CotizacionController extends Controller
                     $matches = [];
                     preg_match('/proveedor-(\d+)-/', $key, $matches);
                     $proveedorIndex = intval($matches[1]);
-        
+
                     // Extraer el índice del producto (si existe)
                     $matches = [];
                     preg_match('/producto-(\d+)-/', $key, $matches);
                     $productoIndex = isset($matches[1]) ? intval($matches[1]) : null;
-        
+
                     // Si es un producto, agregar al arreglo de productos
                     if ($productoIndex !== null) {
                         $productos[$proveedorIndex][$productoIndex] = $value;
                     }
                 }
             }
-        
+
             foreach ($productos as $proveedorIndex => $productosProveedor) {
                 // Inserta los datos del proveedor en la tabla correspondiente
                 $CBM = $request->input("proveedor-{$proveedorIndex}-cbm");
@@ -64,20 +78,20 @@ class CotizacionController extends Controller
                 $CBMTotal += $CBM;
                 $peso = $request->input("proveedor-{$proveedorIndex}-peso");
                 $pesoTotal += $peso;
-                $proformas= $request->file("proveedor-{$proveedorIndex}-proforma[]");
+                $proformas = $request->file("proveedor-{$proveedorIndex}-proforma[]");
                 //foreahc file in proformas
-                $urlProforma=null;
-                $urlPacking=null;
+                $urlProforma = null;
+                $urlPacking = null;
                 //proveedor-0-proforma-0 is urlProforma
                 //proveedor-0-proforma-1 is urlPacking
                 $proforma = $request->file("proveedor-{$proveedorIndex}-proforma-0");
-                if($proforma){
+                if ($proforma) {
                     $nombreArchivo = uniqid('proforma_');
                     $urlProforma = Storage::put('public/proformas/' . $nombreArchivo, $proforma);
                     $urlProforma = config('app.url') . Storage::url($urlProforma);
                 }
                 $packing = $request->file("proveedor-{$proveedorIndex}-proforma-1");
-                if($packing){
+                if ($packing) {
                     $nombreArchivo = uniqid('packing_');
                     $urlPacking = Storage::put('public/packings/' . $nombreArchivo, $packing);
                     $urlPacking = config('app.url') . Storage::url($urlPacking);
@@ -89,7 +103,7 @@ class CotizacionController extends Controller
                     'URL_Proforma' => $urlProforma,
                     'URL_Packing' => $urlPacking,
                 ]);
-        
+
                 // Itera sobre los productos del proveedor
                 foreach ($productosProveedor as $productoIndex => $producto) {
                     $nombreComercial = $request->input("proveedor-{$proveedorIndex}-producto-{$productoIndex}-nombre");
@@ -101,7 +115,7 @@ class CotizacionController extends Controller
                     $nombreArchivo = uniqid('image_');
                     $urlImagen = Storage::put('public/imagenes/' . $nombreArchivo, $archivo);
                     $urlAbsoluta = config('app.url') . Storage::url($urlImagen);
-                    $valorUnitario =$request->input("proveedor-{$proveedorIndex}-producto-{$productoIndex}-valor");
+                    $valorUnitario = $request->input("proveedor-{$proveedorIndex}-producto-{$productoIndex}-valor");
                     // Inserta los datos del producto en la tabla correspondiente
                     $productoID = DB::table('carga_consolidada_cotizaciones_detalles_producto')->insertGetId([
                         'ID_Proveedor' => $proveedorID,
@@ -110,27 +124,26 @@ class CotizacionController extends Controller
                         'Uso' => $uso,
                         'Cantidad' => $cantidad,
                         'URL_Link' => $link,
-                        'URL_Image' =>$urlAbsoluta,
+                        'URL_Image' => $urlAbsoluta,
                         "Valor_Unitario" => $valorUnitario,
                     ]);
-        
+
                     // Inserta los tipos de tributo para el producto
                     $tributesIdArray = DB::table('tipo_carga_consolidada_cotizaciones_tributo')->pluck('ID_Tipo_Tributo')->toArray();
                     foreach ($tributesIdArray as $tribute) {
-                        $defaultValue=0;
-                        if($tribute==1){
-                            $defaultValue=0;
-                        }
-                        else if($tribute==2){
-                            $defaultValue=16;
-                        } else if($tribute==3){
-                            $defaultValue=2;
-                        }else if($tribute==4){
-                            $defaultValue=3.50;
-                        } else if($tribute==5){
-                            $defaultValue=0;
-                        } else if($tribute==6){
-                            $defaultValue=0;
+                        $defaultValue = 0;
+                        if ($tribute == 1) {
+                            $defaultValue = 0;
+                        } else if ($tribute == 2) {
+                            $defaultValue = 16;
+                        } else if ($tribute == 3) {
+                            $defaultValue = 2;
+                        } else if ($tribute == 4) {
+                            $defaultValue = 3.50;
+                        } else if ($tribute == 5) {
+                            $defaultValue = 0;
+                        } else if ($tribute == 6) {
+                            $defaultValue = 0;
                         }
 
                         DB::table('carga_consolidada_cotizaciones_detalles_tributo')->insert([
@@ -138,7 +151,7 @@ class CotizacionController extends Controller
                             "ID_Cotizacion" => $cotizationID,
                             'ID_Tipo_Tributo' => $tribute,
                             "ID_Producto" => $productoID,
-                            "value"=>$defaultValue
+                            "value" => $defaultValue,
                         ]);
                     }
                 }
@@ -155,13 +168,14 @@ class CotizacionController extends Controller
             DB::commit();
             return response()->json([
                 'message' => 'Cotización creada correctamente',
-                "status" => 201
+                "status" => 201,
+                'code' => $code,
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'message' => 'Error al crear cotización',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
