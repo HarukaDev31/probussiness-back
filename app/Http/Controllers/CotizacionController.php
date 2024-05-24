@@ -96,7 +96,7 @@ class CotizacionController extends Controller
                     $uso = $request->input("proveedor-{$proveedorIndex}-producto-{$productoIndex}-uso");
                     $cantidad = $request->input("proveedor-{$proveedorIndex}-producto-{$productoIndex}-cantidad");
                     $link = $request->input("proveedor-{$proveedorIndex}-producto-{$productoIndex}-link");
-        
+                    $
                     // Maneja el archivo de imagen
                     $archivo = $request->file("proveedor-{$proveedorIndex}-producto-{$productoIndex}-foto");
                     $nombreArchivo = uniqid('image_');
@@ -116,11 +116,30 @@ class CotizacionController extends Controller
                     // Inserta los tipos de tributo para el producto
                     $tributesIdArray = DB::table('tipo_carga_consolidada_cotizaciones_tributo')->pluck('ID_Tipo_Tributo')->toArray();
                     foreach ($tributesIdArray as $tribute) {
+                        $defaultValue=0;
+                        if($tribute==1){
+                            $defaultValue=0;
+                        }
+                        if($tribute==2){
+                            $defaultValue=16;
+                        }if($tribute==3){
+                            $defaultValue=2;
+                        }if($tribute==4){
+                            $defaultValue=3.50;
+                        }if($tribute==5){
+                            $defaultValue=0;
+                        }if($tribute==6){
+                            $defaultValue=0;
+                        }else{
+                            $defaultValue=0;
+                        }
+
                         DB::table('carga_consolidada_cotizaciones_detalles_tributo')->insert([
                             'ID_Proveedor' => $proveedorID,
                             "ID_Cotizacion" => $cotizationID,
                             'ID_Tipo_Tributo' => $tribute,
                             "ID_Producto" => $productoID,
+                            "value" => $defaultValue,
                         ]);
                     }
                 }
