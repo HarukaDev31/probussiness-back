@@ -9,6 +9,24 @@ use Illuminate\Support\Facades\Storage;
 
 class CotizacionController extends Controller
 {
+    public function getClientData(Request $request){
+        $socioCode="PROB_SOC2024";
+        if($request['dni']==$socioCode){
+            return response()->json([
+                'tipoCliente' => 2,
+            ]);
+        }
+        $clientData = DB::table('carga_consolidada_cotizaciones_detalle')
+            ->select('DNI as dni', 'Telefono as whatsapp', 'Nombres as nombres', 'Apellidos as apellidos', 'Empresa as empresa', 'Ruc as ruc', 'Email as email')
+            ->where('DNI', $request['dni'])
+            ->orderBy('ID_Cotizacion', 'desc')
+            ->limit(1)  
+            ->get();
+        return response()->json([
+            'clientData' => $clientData,
+            'tipoCliente' => count($clientData) > 0 ? 1 : 0,
+        ]);
+    }
     public function generateUniqueCode($year)
     {
         $count = DB::table('carga_consolidada_cotizaciones_cabecera')
@@ -26,6 +44,8 @@ class CotizacionController extends Controller
             $clientBusiness = $request['empresa'];
             $clientTelephone = $request['whatsapp'];
             $clientDNI = $request['dni'];
+            $clientEmail = $request['email'];
+            $ruc = $request['ruc'];
             $currentDate = Carbon::now();
             $codeNull = null;
             //code is yy+4digitos, yy is the last 2 digits of the year and 4 digitos is a number of  row in the table in the year
@@ -43,7 +63,7 @@ class CotizacionController extends Controller
                 'N_Cliente' => $clientName . " " . $clientLastName,
                 'Empresa' => $clientBusiness,
                 'Fe_Creacion' => $currentDate,
-                'ID_Tipo_Cliente' => $tipoCliente,
+                'ID_Tipo_Cliente' => $clientDNI == "PROB_SOC2024" ? 3 : $tipoCliente,
                 "Cotizacion_Status" => $cotizationStatus,
                 "CotizacionCode" => $code,
                 'created_at' => $currentDate,
@@ -164,6 +184,10 @@ class CotizacionController extends Controller
                 "Nombres" => $clientName,
                 "Apellidos" => $clientLastName,
                 "Telefono" => $clientTelephone,
+                "Empresa" => $clientBusiness,
+                "Ruc" => $ruc,
+                "Email" => $clientEmail,
+
             ]);
             DB::commit();
             return response()->json([
