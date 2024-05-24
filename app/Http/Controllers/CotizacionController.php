@@ -118,21 +118,18 @@ class CotizacionController extends Controller
                     $tributesIdArray = DB::table('tipo_carga_consolidada_cotizaciones_tributo')->pluck('ID_Tipo_Tributo')->toArray();
                     foreach ($tributesIdArray as $tribute) {
                         $defaultValue=0;
-                        return $tribute;
                         if($tribute==1){
                             $defaultValue=0;
                         }
-                        if($tribute==2){
+                        else if($tribute==2){
                             $defaultValue=16;
-                        }if($tribute==3){
+                        } else if($tribute==3){
                             $defaultValue=2;
-                        }if($tribute==4){
+                        }else if($tribute==4){
                             $defaultValue=3.50;
-                        }if($tribute==5){
+                        } else if($tribute==5){
                             $defaultValue=0;
-                        }if($tribute==6){
-                            $defaultValue=0;
-                        }else{
+                        } else if($tribute==6){
                             $defaultValue=0;
                         }
 
