@@ -328,7 +328,7 @@ class UpdateSps extends Migration
                         and ID_Tipo_Tributo =tipo_tributo
                         ;
                     return v_value;
-                END";
+        END";
         DB::unprepared($function);
     }
 
