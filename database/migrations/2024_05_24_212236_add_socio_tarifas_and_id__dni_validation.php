@@ -13,9 +13,9 @@ class AddSocioTarifasAndIdDniValidation extends Migration
      */
     public function up()
     {
-        $alterDetalles="alter table carga_consolidada_cotizaciones_detalle add column Email varchar(50) ;
-        alter table carga_consolidada_cotizaciones_detalle add column Empresa varchar(50) ;
-        alter table carga_consolidada_cotizaciones_detalle add column Ruc varchar(50) ;";
+        $alterDetalles="alter table carga_consolidada_cotizaciones_detalle add column Email varchar(50);";
+        $alterDetalles2="alter table carga_consolidada_cotizaciones_detalle add column Empresa varchar(50) ;";
+        $alterDetalles3="alter table carga_consolidada_cotizaciones_detalle add column Ruc varchar(50)";
         $insertSocioTarifas="insert into carga_consolidada_cbm_tarifas(id_tipo_tarifa,id_tipo_cliente,limite_inf,limite_sup,currency,tarifa,created_at)
         values(1,3,0.1,0.99,'USD',250,now()),
         (2,3,1,999999,'USD',250,now());";
@@ -32,6 +32,8 @@ class AddSocioTarifasAndIdDniValidation extends Migration
         DB::statement($insertSocioTarifas);
         DB::statement($updateErrorTarifas);
         DB::statement($alterDetalles);
+        DB::statement($alterDetalles2);
+        DB::statement($alterDetalles3);
 
     }
 
