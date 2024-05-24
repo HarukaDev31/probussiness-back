@@ -14,7 +14,7 @@ class UpdateSps extends Migration
     public function up()
     {
         //drop procedure if exists get_cotization_v2;
-        DB::unprepared('DROP PROCEDURE IF EXISTS get_cotization_v2');
+        DB::unprepared('DROP PROCEDURE IF EXISTS get_cotization_tributos_v2');
         $sp="CREATE PROCEDURE `get_cotization_tributos_v2`(IN p_id_cotizacion int)
         begin
             
