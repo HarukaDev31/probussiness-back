@@ -97,11 +97,13 @@ class CotizacionController extends Controller
             foreach ($productos as $proveedorIndex => $productosProveedor) {
                 // Inserta los datos del proveedor en la tabla correspondiente
                 $CBM = $request->input("proveedor-{$proveedorIndex}-cbm");
-
+                $tipoPeso=$request->input("proveedor-{$proveedorIndex}-peso-unidad");
                 $CBMTotal += $CBM;
                 $peso = $request->input("proveedor-{$proveedorIndex}-peso");
+                if($tipoPeso=="Tn"){
+                    $peso=$peso*1000;
+                }
                 $pesoTotal += $peso;
-                $proformas = $request->file("proveedor-{$proveedorIndex}-proforma[]");
                 //foreahc file in proformas
                 $urlProforma = null;
                 $urlPacking = null;
