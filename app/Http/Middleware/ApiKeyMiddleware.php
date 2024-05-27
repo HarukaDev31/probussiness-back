@@ -19,7 +19,6 @@ class ApiKeyMiddleware
         $apiKey = $request->header('api-key');
         $validApiKey = env('API_KEY'); // Puedes almacenar la API key en el archivo .env
         //return all headers in json format
-        return response()->json($request->header());
         // Verificar el encabezado Origin
         $origin = $request->header('Origin');
         $appUrl = config('app.url');
