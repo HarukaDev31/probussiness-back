@@ -16,8 +16,7 @@ class ApiKeyMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $apiKey = $request->header('Api_key');
-        return $request->all(); // Obtiene la API key del encabezado de la solicitud
+        $apiKey = $request->header('api_key');
         $validApiKey = env('API_KEY'); // Puedes almacenar la API key en el archivo .env
 
         // Verificar el encabezado Origin
