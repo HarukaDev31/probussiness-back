@@ -17,5 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::post('/create-cotization', 'App\Http\Controllers\CotizacionController@createCotization');
-Route::post('/get-client-data', 'App\Http\Controllers\CotizacionController@getClientData');
+Route::middleware(['api', 'api.key'])->group(function () {
+    Route::post('/create-cotization', 'App\Http\Controllers\CotizacionController@createCotization');
+    Route::post('/get-client-data', 'App\Http\Controllers\CotizacionController@getClientData');
+});
