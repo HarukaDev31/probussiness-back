@@ -59,7 +59,7 @@ class CotizacionController extends Controller
             //check if exists row with the same code, and  carga_consolidada_cotizaciones_cabecera.Cotizacion_Status_ID =3 in carga_consolidada_cotizaciones_detalle table joined with carga_consolidada_cotizaciones_cabecera if exists set tipoCliente to 2
             $exists = DB::table('carga_consolidada_cotizaciones_detalle as detalle')
                 ->join('carga_consolidada_cotizaciones_cabecera as cabecera', 'detalle.Cotizacion_ID', '=', 'cabecera.Cotizacion_ID')
-                ->where('detalle.Codigo', $code)
+                ->where('detalle.DNI', $code)
                 ->where('cabecera.Cotizacion_Status_ID', 3)
                 ->exists();
 
