@@ -22,7 +22,17 @@ class CotizacionController extends Controller
             ->where('DNI', $request['dni'])
             ->orderBy('ID_Cotizacion', 'desc')
             ->limit(1)
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                // Recorrer cada atributo del objeto
+                foreach ($item as $key => $value) {
+                    // Si el valor es null o es la cadena "null", convertirlo a una cadena vacía
+                    if (is_null($value) || $value === 'null') {
+                        $item->$key = '';
+                    }
+                }
+                return $item;
+            });
         return response()->json([
             'clientData' => $clientData,
             'tipoCliente' => count($clientData) > 0 ? 1 : 0,
