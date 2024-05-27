@@ -25,6 +25,7 @@ class ApiKeyMiddleware
         $validOrigins = [$appUrl];
 
         if ($apiKey !== $validApiKey) {
+            return response()->json(['api_key' => $apiKey, 'valid_api_key' => $validApiKey]);
             return response()->json(['error' => 'Unauthorized'], 401); // Respuesta en caso de API key inválida
         }
 
