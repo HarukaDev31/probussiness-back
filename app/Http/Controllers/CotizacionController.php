@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Storage;
 
 class CotizacionController extends Controller
 {
-    public function getClientData(Request $request){
-        $socioCode="PROB_SOC2024";
-        if($request['dni']==$socioCode){
+    public function getClientData(Request $request)
+    {
+        $socioCode = "PROB_SOC2024";
+        if ($request['dni'] == $socioCode) {
             return response()->json([
                 'tipoCliente' => 2,
             ]);
@@ -20,7 +21,7 @@ class CotizacionController extends Controller
             ->select('DNI as dni', 'Telefono as whatsapp', 'Nombres as nombres', 'Apellidos as apellidos', 'Empresa as empresa', 'Ruc as ruc', 'Email as email')
             ->where('DNI', $request['dni'])
             ->orderBy('ID_Cotizacion', 'desc')
-            ->limit(1)  
+            ->limit(1)
             ->get();
         return response()->json([
             'clientData' => $clientData,
@@ -32,7 +33,7 @@ class CotizacionController extends Controller
         $count = DB::table('carga_consolidada_cotizaciones_cabecera')
             ->whereYear('Fe_Creacion', $year)
             ->count() + 1;
-        $yearLastTwoDigits = substr($year, 2);   
+        $yearLastTwoDigits = substr($year, 2);
         return $yearLastTwoDigits . str_pad($count, 4, '0', STR_PAD_LEFT);
     }
     public function createCotization(Request $request)
@@ -55,10 +56,16 @@ class CotizacionController extends Controller
             $tipoCliente = 1;
             $cotizationStatus = "Pendiente";
             $code = $this->generateUniqueCode($currentDate->year);
-            //check if exists row with the same code in carga_consolidada_cotizaciones_detalle table if exists set tipoCliente to 2
-            // if (DB::table('carga_consolidada_cotizaciones_detalle')->where('DNI', $clientDNI)->exists()) {
-            //     $tipoCliente = 2;
-            // }
+            //check if exists row with the same code, and  carga_consolidada_cotizaciones_cabecera.Cotizacion_Status_ID =3 in carga_consolidada_cotizaciones_detalle table joined with carga_consolidada_cotizaciones_cabecera if exists set tipoCliente to 2
+            $exists = DB::table('carga_consolidada_cotizaciones_detalle as detalle')
+                ->join('carga_consolidada_cotizaciones_cabecera as cabecera', 'detalle.Cotizacion_ID', '=', 'cabecera.Cotizacion_ID')
+                ->where('detalle.Codigo', $code)
+                ->where('cabecera.Cotizacion_Status_ID', 3)
+                ->exists();
+
+            if ($exists) {
+                $tipoCliente = 2;
+            }
             // Verificar unicidad del código
             while (DB::table('carga_consolidada_cotizaciones_cabecera')->where('CotizacionCode', $code)->exists()) {
                 $code = $this->generateUniqueCode($currentDate->year);
@@ -97,11 +104,11 @@ class CotizacionController extends Controller
             foreach ($productos as $proveedorIndex => $productosProveedor) {
                 // Inserta los datos del proveedor en la tabla correspondiente
                 $CBM = $request->input("proveedor-{$proveedorIndex}-cbm");
-                $tipoPeso=$request->input("proveedor-{$proveedorIndex}-peso-unidad");
+                $tipoPeso = $request->input("proveedor-{$proveedorIndex}-peso-unidad");
                 $CBMTotal += $CBM;
                 $peso = $request->input("proveedor-{$proveedorIndex}-peso");
-                if($tipoPeso=="Tn"){
-                    $peso=$peso*1000;
+                if ($tipoPeso == "Tn") {
+                    $peso = $peso * 1000;
                 }
                 $pesoTotal += $peso;
                 //foreahc file in proformas
