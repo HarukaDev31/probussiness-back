@@ -23,7 +23,7 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*', 'api_key'],
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 
