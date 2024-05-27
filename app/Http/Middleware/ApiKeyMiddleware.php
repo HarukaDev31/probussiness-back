@@ -21,7 +21,8 @@ class ApiKeyMiddleware
 
         // Verificar el encabezado Origin
         $origin = $request->header('Origin');
-        $validOrigins = ['https://cargaconsolidada.probusiness.pe'];
+        $appUrl = config('app.url');
+        $validOrigins = [$appUrl];
 
         if ($apiKey !== $validApiKey) {
             return response()->json(['error' => 'Unauthorized'], 401); // Respuesta en caso de API key inválida

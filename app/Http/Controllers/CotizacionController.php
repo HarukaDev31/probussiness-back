@@ -56,9 +56,9 @@ class CotizacionController extends Controller
             $cotizationStatus = "Pendiente";
             $code = $this->generateUniqueCode($currentDate->year);
             //check if exists row with the same code in carga_consolidada_cotizaciones_detalle table if exists set tipoCliente to 2
-            if (DB::table('carga_consolidada_cotizaciones_detalle')->where('DNI', $clientDNI)->exists()) {
-                $tipoCliente = 2;
-            }
+            // if (DB::table('carga_consolidada_cotizaciones_detalle')->where('DNI', $clientDNI)->exists()) {
+            //     $tipoCliente = 2;
+            // }
             // Verificar unicidad del código
             while (DB::table('carga_consolidada_cotizaciones_cabecera')->where('CotizacionCode', $code)->exists()) {
                 $code = $this->generateUniqueCode($currentDate->year);
