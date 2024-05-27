@@ -16,7 +16,7 @@ class ApiKeyMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $apiKey = $request->header('Api_key') ?: $request->header('api_key') ?: $request->header('API_KEY');
+        $apiKey = $request->header('api-key');
         $validApiKey = env('API_KEY'); // Puedes almacenar la API key en el archivo .env
         //return all headers in json format
         return response()->json($request->header());
@@ -26,7 +26,6 @@ class ApiKeyMiddleware
         $validOrigins = [$appUrl];
 
         if ($apiKey !== $validApiKey) {
-            return response()->json(['api_key' => $apiKey, 'valid_api_key' => $validApiKey]);
             return response()->json(['error' => 'Unauthorized'], 401); // Respuesta en caso de API key inválida
         }
 
