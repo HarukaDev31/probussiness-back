@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://cargaconsolidada.probusiness.pe/'],
+    'allowed_origins' => ['https://cargaconsolidada.probusiness.pe'],
 
     'allowed_origins_patterns' => [],
 
