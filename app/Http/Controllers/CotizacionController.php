@@ -44,7 +44,8 @@ class CotizacionController extends Controller
             ->whereYear('Fe_Creacion', $year)
             ->count() + 1;
         $yearLastTwoDigits = substr($year, 2);
-        return $yearLastTwoDigits . str_pad($count, 4, '0', STR_PAD_LEFT);
+        $month = Carbon::now()->format('m');
+        return $yearLastTwoDigits . $month . str_pad($count, 4, '0', STR_PAD_LEFT);
     }
     public function createCotization(Request $request)
     {
