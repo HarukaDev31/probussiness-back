@@ -45,7 +45,8 @@ class CotizacionController extends Controller
             ->count() + 1;
         $yearLastTwoDigits = substr($year, 2);
         $month = Carbon::now()->format('m');
-        return $yearLastTwoDigits . $month . str_pad($count, 4, '0', STR_PAD_LEFT);
+        $random4Digits = str_pad($count, 4, '0', STR_PAD_LEFT);
+        return $yearLastTwoDigits .$random4Digits .$month . str_pad($count, 4, '0', STR_PAD_LEFT);
     }
     public function createCotization(Request $request)
     {
