@@ -13,8 +13,8 @@ class AddDeletedAtToCotizacionesCabecera extends Migration
      */
     public function up()
     {
-        $query="alter table carga_consolidada_cotizaciones_cabecera  add column deleted_at date;";
-        DB::statement($query);
+        // $query="alter table carga_consolidada_cotizaciones_cabecera  add column deleted_at date;";
+        // DB::statement($query);
     }
 
     /**
