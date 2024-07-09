@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class InitProcedures extends Migration
 {
@@ -12,7 +13,8 @@ class InitProcedures extends Migration
      * @return void
      */
     public function up()
-    {
+    {   //drop if exists
+        DB::unprepared("DROP FUNCTION IF EXISTS get_cbm_total");
         $getCBMTotal="CREATE  FUNCTION `get_cbm_total`(id_cotizacion int, cbm decimal(10,2),tipo_cliente int) RETURNS decimal(10,2)
         begin
             declare precio decimal(10,2)  default 0;
@@ -26,6 +28,8 @@ class InitProcedures extends Migration
             ) limit 1;
             return v_tarifa;
         END";
+        //drop if exists
+        DB::unprepared("DROP PROCEDURE IF EXISTS get_cotization_tributos_v2");
         $getCotizationTributos="CREATE PROCEDURE `get_cotization_tributos_v2`( IN p_id_cotizacion int )
         begin
                 declare v_t_cliente int default 1;
@@ -326,7 +330,8 @@ class InitProcedures extends Migration
                 WHERE
                     cccdp.ID_Cotizacion = p_id_cotizacion;
             END;";
-
+            //drop if exists
+        DB::unprepared("DROP FUNCTION IF EXISTS get_taxes_calc");
             $getTaxCalc="CREATE  FUNCTION `get_taxes_calc`(p_producto_id INT,
             p_cotizacion_id INT,
             p_tributo_id INT,
@@ -381,6 +386,8 @@ class InitProcedures extends Migration
         
             RETURN v_valor_tributo;
         END;";
+        //drop if exists
+        DB::unprepared("DROP FUNCTION IF EXISTS get_tribute_value");
         $getTributeValue="CREATE  FUNCTION `get_tribute_value`(p_id_producto int ,tipo_tributo int) RETURNS int(11)
         begin
             declare v_value int default 0;
