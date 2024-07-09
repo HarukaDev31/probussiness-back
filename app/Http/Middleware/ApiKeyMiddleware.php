@@ -21,7 +21,7 @@ class ApiKeyMiddleware
         //return all headers in json format
         // Verificar el encabezado Origin
         $origin = $request->header('Origin');
-        $appUrl = config('app.url');
+        $appUrl = config('app.frontend_url');
         $validOrigins = [$appUrl];
 
         if ($apiKey !== $validApiKey) {
