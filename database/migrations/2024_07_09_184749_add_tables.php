@@ -13,16 +13,16 @@ class AddTables extends Migration
      */
     public function up()
     {
-        $query="CREATE TABLE suppliers (
-            id_supplier INT NOT NULL,
-            name VARCHAR(200) NULL,
-            phone VARCHAR(50) NULL,
-            code VARCHAR(10) NULL,
-            rating DECIMAL(10,2) NULL,
-            c_orders INT NOT NULL
-        )
-        ";
-        DB::statement($query);
+        // $query="CREATE TABLE suppliers (
+        //     id_supplier INT NOT NULL,
+        //     name VARCHAR(200) NULL,
+        //     phone VARCHAR(50) NULL,
+        //     code VARCHAR(10) NULL,
+        //     rating DECIMAL(10,2) NULL,
+        //     c_orders INT NOT NULL
+        // )
+        // ";
+        // DB::statement($query);
         //
     }
 
