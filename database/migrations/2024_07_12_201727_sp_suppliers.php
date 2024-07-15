@@ -62,6 +62,7 @@ BEGIN
 END";
     $drop = "DROP PROCEDURE IF EXISTS `get_suppliers_products`";
     DB::unprepared($drop);
+    DB::unprepared($sp);
     }
 
     /**
