@@ -38,7 +38,6 @@ BEGIN
                         '\",\"pago2\":\"', IFNULL(acc.pago_2_value, ''),
                         '\",\"pago2URL\":\"', IFNULL(acc.pago_2_URL, ''),
                         '\",\"imagenURL\":\"',a2.Txt_Url_Imagen_Producto,
-                        '\",\"descripcion\":\"',a2.Txt_Descripcion,
                         '\",\"estado\":\"', IFNULL(b.Ss_Precio, ''),
                         '\",\"unidad_medida\":\"', IFNULL(b.unidad_medida, ''),
 
