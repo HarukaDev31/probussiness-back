@@ -14,7 +14,7 @@ class AddPagosNotasColumnToAgenteCompraPedidoCabeceraTable extends Migration
     public function up()
     {
         Schema::table('agente_compra_pedido_cabecera', function (Blueprint $table) {
-            $table->text('notas')->nullable();
+            $table->text('pagos_notas')->nullable();
         });
     }
 
