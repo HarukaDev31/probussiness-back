@@ -13,26 +13,26 @@ class AlterTables extends Migration
      */
     public function up()
     {
-        /**
-         * alter table agente_compra_pedido_detalle_producto_proveedor add column total_box decimal(10,2);
-alter table agente_compra_pedido_detalle_producto_proveedor add column total_cbm decimal(10,2);
-alter table agente_compra_pedido_detalle_producto_proveedor add column total_kg decimal(10,2);
-alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_foto1 text;
-alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_foto2 text;
-alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_estado enum("PENDIENTE","RECIBIDO") default "PENDIENTE";
-         * 
-         * 
-         */
-        $sp = "alter table agente_compra_pedido_detalle_producto_proveedor add column total_box decimal(10,2);
-            alter table agente_compra_pedido_detalle_producto_proveedor add column total_cbm decimal(10,2);
-            alter table agente_compra_pedido_detalle_producto_proveedor add column total_kg decimal(10,2);
-            alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_foto1 text;
-            alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_foto2 text;
-            alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_estado enum('PENDIENTE','RECIBIDO') default 'PENDIENTE';";
+//         /**
+//          * alter table agente_compra_pedido_detalle_producto_proveedor add column total_box decimal(10,2);
+// alter table agente_compra_pedido_detalle_producto_proveedor add column total_cbm decimal(10,2);
+// alter table agente_compra_pedido_detalle_producto_proveedor add column total_kg decimal(10,2);
+// alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_foto1 text;
+// alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_foto2 text;
+// alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_estado enum("PENDIENTE","RECIBIDO") default "PENDIENTE";
+//          * 
+//          * 
+         
+        // $sp = "alter table agente_compra_pedido_detalle_producto_proveedor add column total_box decimal(10,2);
+        //     alter table agente_compra_pedido_detalle_producto_proveedor add column total_cbm decimal(10,2);
+        //     alter table agente_compra_pedido_detalle_producto_proveedor add column total_kg decimal(10,2);
+        //     alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_foto1 text;
+        //     alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_foto2 text;
+        //     alter table agente_compra_pedido_detalle_producto_proveedor add column almacen_estado enum('PENDIENTE','RECIBIDO') default 'PENDIENTE';";
 
-        DB::unprepared($sp);
-        $sp = "alter table agente_compra_pedido_detalle_producto_proveedor add column total_box decimal(10,2);";
-        DB::unprepared($sp);
+        // DB::unprepared($sp);
+        // $sp = "alter table agente_compra_pedido_detalle_producto_proveedor add column total_box decimal(10,2);";
+        // DB::unprepared($sp);
     }
 
     /**
