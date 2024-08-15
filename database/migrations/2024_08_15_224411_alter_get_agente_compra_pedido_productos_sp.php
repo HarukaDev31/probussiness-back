@@ -11,6 +11,7 @@ class AlterGetAgenteCompraPedidoProductosSp extends Migration
      */
     public function up()
     {
+        DB::unprepared('DROP PROCEDURE IF EXISTS get_agente_compra_pedido_productos');
         $sp = "CREATE PROCEDURE get_agente_compra_pedido_productos(in p_id_producto int)
         begin
 	select
