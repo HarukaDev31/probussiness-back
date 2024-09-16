@@ -227,4 +227,108 @@ class CotizacionController extends Controller
             ], 500);
         }
     }
+    public function enviarPedido(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Crear cliente si no existe
+            $nombreEntidad = trim($request->input('nombres'));
+            $numeroDocumentoIdentidad = trim($request->input('dni'));
+            $tipoDocumentoIdentidad = strlen($numeroDocumentoIdentidad) == 11 ? 4 : 1; // 4=RUC, 1=OTROS
+
+            $entity = DB::table('entidad')
+                ->where('ID_Empresa', 1)
+                ->where('Nu_Tipo_Entidad', 0)
+                ->where('ID_Tipo_Documento_Identidad', $tipoDocumentoIdentidad)
+                ->where('Nu_Documento_Identidad', $numeroDocumentoIdentidad)
+                ->whereNotNull('Nu_Documento_Identidad')
+                ->where('Nu_Documento_Identidad', '!=', '')
+                ->where('No_Entidad', $this->limpiarCaracteresEspeciales($nombreEntidad))
+                ->first();
+
+            if (!$entity) {
+                $idEntidad = DB::table('entidad')->insertGetId([
+                    'ID_Empresa' => 1,
+                    'ID_Organizacion' => 1,
+                    'Nu_Tipo_Entidad' => 0,
+                    'ID_Tipo_Documento_Identidad' => $tipoDocumentoIdentidad,
+                    'Nu_Documento_Identidad' => $numeroDocumentoIdentidad,
+                    'No_Entidad' =>$nombreEntidad,
+                    'Nu_Estado' => 1,
+                    'ID_Pais' => $request->input('pais'),
+                    'Nu_Codigo_Pais' =>$request->input('pais'),
+                    'Nu_Celular_Entidad' => $request->input('tel'),
+                    'Txt_Email_Entidad' => $request->input('email'),
+                    'No_Contacto' =>  $request->input('empresa'),
+                    
+                    'Nu_Celular_Contacto' => $request->input('tel'),
+                    'Txt_Email_Contacto' => $request->input('email'),
+                    'Txt_Perfil_Compra' => '',
+                    'Txt_Rubro_Importacion' => '',
+                    'Nu_Agente_Compra' => 1,
+                ]);
+            } else {
+                $idEntidad = $entity->ID_Entidad;
+            }
+
+            $idHeader = DB::table('agente_compra_pedido_cabecera')->insertGetId([
+                'ID_Empresa' => 1,
+                'ID_Organizacion' => 1,
+                'Fe_Emision' => now()->toDateString(),
+                'ID_Entidad' => $idEntidad,
+                'ID_Pais' => $request->input('pais'),
+                'Nu_Estado' => 1,
+                'Fe_Registro' => now(),
+                'No_Usuario'=>$request->input('nombres'),
+            ]);
+
+            $orderDetails = [];
+            foreach ($request->input('addProducto') as $index => $product) {
+                if ($request->hasFile("voucher.$index")) {
+
+                    $path = $request->file("voucher.$index")->store('public');
+                    $url = asset(str_replace('public', 'storage', $path));  
+                } else {
+                    $url = null;
+                }
+
+                $orderDetails[] = [
+                    'ID_Empresa' => 1,
+                    'ID_Organizacion' => 1,
+                    'ID_Pedido_Cabecera' => $idHeader,
+                    'Txt_Producto' => $product['nombre_comercial'],
+                    'Txt_Descripcion' => nl2br($product['caracteristicas']),
+                    'Qt_Producto' => $product['cantidad'],
+                    'Txt_Url_Imagen_Producto' => $url,
+                    'Txt_Url_Link_Pagina_Producto' => $product['link'],
+                ];
+            }
+
+            DB::table('agente_compra_pedido_detalle')->insert($orderDetails);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Pedido creado',
+                'result' => [
+                    'id' => $idHeader,
+                ],
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => '¡Oops! Algo salió mal. ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    private function limpiarCaracteresEspeciales($string)
+    {
+        // Implement your string cleaning logic here
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $string);
+    }
 }

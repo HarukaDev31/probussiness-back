@@ -22,7 +22,8 @@ class ApiKeyMiddleware
         // Verificar el encabezado Origin
         $origin = $request->header('Origin');
         $appUrl = config('app.frontend_url');
-        $validOrigins = [$appUrl];
+        $agenteCompra=config('app.agente_url');
+        $validOrigins = [$appUrl, $agenteCompra];
 
         if ($apiKey !== $validApiKey) {
             return response()->json(['error' => 'Unauthorized'], 401); // Respuesta en caso de API key inválida
