@@ -331,4 +331,12 @@ class CotizacionController extends Controller
         // Implement your string cleaning logic here
         return preg_replace('/[^A-Za-z0-9\-]/', '', $string);
     }
+    public function getPaises(Request $request)
+    {
+        $paises = DB::table('pais')->select('ID_Pais', 'No_Pais')->get();
+        return response()->json([
+            'paises' => $paises,
+        ]);
+        
+    }
 }
