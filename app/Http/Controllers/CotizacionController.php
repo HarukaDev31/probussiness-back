@@ -6,9 +6,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
+use App\Traits\WebSocketTrait;
 class CotizacionController extends Controller
 {
+    use WebSocketTrait;
     public function getClientData(Request $request)
     {
         $socioCode = "PROB_SOC2024";
@@ -214,10 +215,19 @@ class CotizacionController extends Controller
 
             ]);
             DB::commit();
+           
+            $dataSocket=[
+                'project' => 'intranet',
+                'role' => '2',
+                'user' => '3',
+                'message' => 'Se ha creado una nueva cotización con el código '.$code.'.',
+            ];
+            $notiResponse=$this->sendEvent($dataSocket);
             return response()->json([
                 'message' => 'Cotización creada correctamente',
                 "status" => 201,
                 'code' => $code,
+                'notiResponse' => $notiResponse,
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
